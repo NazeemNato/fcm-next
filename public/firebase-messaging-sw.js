@@ -1,5 +1,5 @@
-importScripts('https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js');
-importScripts('https://www.gstatic.com/firebasejs/8.2.1/firebase-messaging.js');
+importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-messaging-compat.js');
 
 firebase.initializeApp({
     apiKey: "AIzaSyByWevzPQxCjyonS7x8vB5jmM3QD5Iu9qY",
@@ -11,16 +11,10 @@ firebase.initializeApp({
     measurementId: "G-710G7TR9CH",
 })
 
-const messaging = firebase.messaging()
-messaging.onBackgroundMessage(function(payload) {
-    console.log('[firebase-messaging-sw.js] Received background message ', payload);
-    // // Customize notification here
-    // const notificationTitle = 'Background Message Title';
-    // const notificationOptions = {
-    //   body: 'Background Message body.',
-    //   icon: '/firebase-logo.png'
-    // };
-  
-    // self.registration.showNotification(notificationTitle,
-    //   notificationOptions);
-  });
+const isSupported = firebase.messaging.isSupported();
+if (isSupported) {
+    const messaging = firebase.messaging();
+    messaging.onBackgroundMessage(({ notification: { title, body, image } }) => {
+        self.registration.showNotification(title, { body, icon: image || '/assets/icons/icon-72x72.png' });
+    });
+}
