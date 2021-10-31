@@ -1,5 +1,5 @@
-import "firebase/messaging";
-import firebase from "firebase/app";
+import { initializeApp } from "firebase/app";
+import { getMessaging, getToken, deleteToken } from "firebase/messaging";
 import axios from "axios";
 
 const config = {
@@ -11,25 +11,19 @@ const config = {
   appId: "1:145394511716:web:3a35a15b534f0622929471",
   measurementId: "G-710G7TR9CH",
 };
-
-if(!firebase.apps.length){
-  firebase.initializeApp(config);
-}
+const app = initializeApp(config);
 
 export const notification = async () => {
   if (typeof window !== "undefined") {
-
     const tk = localStorage.getItem("token");
     if (tk) {
       return tk;
     }
 
-
     const status = await Notification.requestPermission();
-    const messaging = firebase.messaging();
-    
     if (status === "granted") {
-      const token = await messaging.getToken({
+const messaging = getMessaging(app);
+      const token = await getToken(messaging, {
         vapidKey:
           "BP9ZiQjq4Zfaqu7kI7TuX0t4fpyLSilgBDAdS3dP2gAL7tR-SPTPw2mHGXqNWVvk2ajKtGcaabE5UM4AHJyYLUI",
       });
@@ -45,11 +39,10 @@ export const notification = async () => {
   }
 };
 
-export const deleteToken = async () => {
+export const removeToken = async () => {
   if (typeof window !== "undefined") {
-const messaging = firebase.messaging();
-
-    await messaging.deleteToken();
+const messaging = getMessaging(app);
+    await deleteToken(messaging);
     localStorage.removeItem("token");
   }
 };
